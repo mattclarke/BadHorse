@@ -34,6 +34,21 @@ void BadGuy::addEnemyAndViceVersa(std::shared_ptr<BadGuy> enemy1, std::shared_pt
 	enemy2->addEnemy(enemy1);
 }
 
+
+class Graph {
+private:
+	std::set<std::shared_ptr<BadGuy>> nodes;
+
+public:
+	int getNumberNodes() {
+		return nodes.size();
+	}
+
+	void addNode(std::shared_ptr<BadGuy> node) {
+		nodes.insert(node);
+	}
+};
+
 #include "gmock/gmock.h"
 #include <algorithm>
 
@@ -71,6 +86,19 @@ TEST_F(BadGuyTest, AddingEnemyMoreThanOnceIsIgnored) {
 
 TEST_F(BadGuyTest, AddingEnemyAlsoAddsMeToTheirEnemies) {
 	ASSERT_TRUE(enemy->isEnemy(baddie));
+}
+
+TEST(GraphTest, EmptyGraphHasNoNodes) {
+	Graph graph;
+	ASSERT_EQ(graph.getNumberNodes(), 0);
+}
+
+TEST(GraphTest, AddingNodeIncreasesNodeCount) {
+	Graph graph;
+	std::shared_ptr<BadGuy> node = std::make_shared<BadGuy>();
+
+	graph.addNode(node);
+	ASSERT_EQ(graph.getNumberNodes(), 1);
 }
 
 int main(int ac, char* av[])
