@@ -1,59 +1,76 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <set>
+
 
 class BadGuy {
 private:
-	std::vector<std::shared_ptr<BadGuy>> enemies;
+	std::set<std::shared_ptr<BadGuy>> enemies;
+
 public:
-	std::vector<std::shared_ptr<BadGuy>> getEnemies() {
-		return enemies;
+	static void addEnemyAndViceVersa(std::shared_ptr<BadGuy> enemy1, std::shared_ptr<BadGuy> enemy2);
+
+	size_t getNumberEnemies() {
+		return enemies.size();
 	}
 
 	void addEnemy(std::shared_ptr<BadGuy> enemy) {
-		enemies.push_back(enemy);
+		enemies.insert(enemy);
+	}
+
+	bool isEnemy(std::shared_ptr<BadGuy> enemy) {
+		auto it = enemies.find(enemy);
+		if (it != enemies.end()) {
+			return true;
+		}
+
+		return false;
 	}
 };
+
+void BadGuy::addEnemyAndViceVersa(std::shared_ptr<BadGuy> enemy1, std::shared_ptr<BadGuy> enemy2) {
+	enemy1->addEnemy(enemy2);
+	enemy2->addEnemy(enemy1);
+}
 
 #include "gmock/gmock.h"
 #include <algorithm>
 
 
+class BadGuyTest : public ::testing::Test {
+protected:
+	virtual void SetUp() {
+		baddie = std::make_shared<BadGuy>();
+		enemy = std::make_shared<BadGuy>();
+		BadGuy::addEnemyAndViceVersa(baddie, enemy);
+	}
 
-TEST(BadHorseSolver, EnemiesForPersonWithNoEnemiesIsEmpty) {
+	std::shared_ptr<BadGuy> baddie;
+	std::shared_ptr<BadGuy> enemy;
+};
+
+
+TEST(BadHorseSolver, NumberOfEnemiesForPersonWithNoEnemiesIsZero) {
 	BadGuy baddie;
-	auto enemies = baddie.getEnemies();
 
-	ASSERT_THAT(enemies.size(), testing::Eq(0));
+	ASSERT_EQ(baddie.getNumberEnemies(), 0);
 }
 
-TEST(BadHorseSolver, AddedEnemyIsReturnedInEnemies) {
-	BadGuy baddie;
-	std::shared_ptr<BadGuy> enemy;
+TEST_F(BadGuyTest, AddedEnemyIsAnEnemy) {
+	baddie->addEnemy(enemy);
 
-	baddie.addEnemy(enemy);
-
-	auto enemies = baddie.getEnemies();
-
-	ASSERT_THAT(enemies.size(), testing::Eq(1));
-
-	auto it = find(enemies.begin(), enemies.end(), enemy);
-	if (it == enemies.end()) FAIL();
+	ASSERT_TRUE(baddie->isEnemy(enemy));
 }
 
-TEST(BadHorseSolver, AddingEnemyMoreThanOnceIsIgnored) {
-	BadGuy baddie;
-	std::shared_ptr<BadGuy> enemy;
+TEST_F(BadGuyTest, AddingEnemyMoreThanOnceIsIgnored) {
+	baddie->addEnemy(enemy);
 
-	baddie.addEnemy(enemy);
-	baddie.addEnemy(enemy);
+	ASSERT_EQ(baddie->getNumberEnemies(), 1);
+}
 
-	auto enemies = baddie.getEnemies();
-
-	ASSERT_THAT(enemies.size(), testing::Eq(1));
-
-	auto it = find(enemies.begin(), enemies.end(), enemy);
-	if (it == enemies.end()) FAIL();
+TEST_F(BadGuyTest, AddingEnemyAlsoAddsMeToTheirEnemies) {
+	ASSERT_TRUE(enemy->isEnemy(baddie));
 }
 
 int main(int ac, char* av[])
