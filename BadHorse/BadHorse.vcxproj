@@ -103,13 +103,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Matt\Documents\Codeworkspace\googletest-release-1.8.0\googlemock\include;C:\Users\Matt\Documents\Codeworkspace\googletest-release-1.8.0\googlemock;C:\Users\Matt\Documents\Codeworkspace\googletest-release-1.8.0\googletest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\mjc23\Documents\GitHub\googletest-release-1.8.0\googlemock\include;C:\Users\mjc23\Documents\GitHub\googletest-release-1.8.0\googlemock;C:\Users\mjc23\Documents\GitHub\googletest-release-1.8.0\googletest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>C:\Users\Matt\Documents\Codeworkspace\googletest-release-1.8.0\_vsbuild\googlemock\gtest\Debug\gtest.lib;C:\Users\Matt\Documents\Codeworkspace\googletest-release-1.8.0\_vsbuild\googlemock\Debug\gmock.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\mjc23\Documents\GitHub\googletest-release-1.8.0\build\googlemock\gtest\Debug\gtest.lib;C:\Users\mjc23\Documents\GitHub\googletest-release-1.8.0\build\googlemock\Debug\gmock.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -148,6 +148,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="TestMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BadGuy.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
