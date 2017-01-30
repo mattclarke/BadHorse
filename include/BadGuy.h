@@ -8,9 +8,18 @@
 class BadGuy {
 private:
 	std::set<std::shared_ptr<BadGuy>> enemies;
+	std::string name;
 
 public:
 	static void addEnemyAndViceVersa(std::shared_ptr<BadGuy> enemy1, std::shared_ptr<BadGuy> enemy2);
+
+	BadGuy(std::string name) : name(name) {
+
+	}
+
+	std::string getName() {
+		return name;
+	}
 
 	size_t getNumberEnemies() const {
 		return enemies.size();
