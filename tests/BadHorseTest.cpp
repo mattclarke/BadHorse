@@ -14,15 +14,43 @@ public:
 	}
 
 	void addPairing(std::string name, std::string enemy) {
-		std::shared_ptr<BadGuy> node1 = std::make_shared<BadGuy>(name);
-		std::shared_ptr<BadGuy> node2 = std::make_shared<BadGuy>(enemy);
-		nodes[name] = node1;
-		nodes[enemy] = node2;
-		BadGuy::addEnemyAndViceVersa(node1, node2);
+		if (nodes.count(name) == 0) {
+			std::shared_ptr<BadGuy> node1 = std::make_shared<BadGuy>(name);
+			nodes[name] = node1;
+		}
+		if (nodes.count(enemy) == 0) {
+			std::shared_ptr<BadGuy> node2 = std::make_shared<BadGuy>(enemy);
+			nodes[enemy] = node2;
+		}
+		BadGuy::addEnemyAndViceVersa(nodes[name], nodes[enemy]);
 	}
 
 	std::shared_ptr<BadGuy> getNodeByName(std::string name) {
 		return nodes[name];
+	}
+
+	void solve() {
+		Colour first = red;
+
+		for (auto const& n : nodes) {
+			// Might as well start from the first node whatever it is
+			if (n.second->getColour() == none) {
+				n.second->setColour(first);
+
+				if (first == red) {
+					first = black;
+				}
+				else {
+					first = red;
+				}
+
+				for (auto const& e : n.second->getEnemies()) {
+					if (e->getColour() == none) {
+						e->setColour(first);
+					}
+				}
+			}
+		}
 	}
 };
 
@@ -55,6 +83,19 @@ TEST(BadHorseSolver, GettingNameReturnsName) {
 	ASSERT_EQ(baddie.getName(), "Dave");
 }
 
+TEST(BadHorseSolver, GettingColourWhenNotSetReturnsNone) {
+	BadGuy baddie("Dave");
+
+	ASSERT_EQ(baddie.getColour(), none);
+}
+
+TEST(BadHorseSolver, AfterSettingColourGettingColourReturnsSetValue) {
+	BadGuy baddie("Dave");
+	baddie.setColour(red);
+
+	ASSERT_EQ(baddie.getColour(), red);
+}
+
 TEST_F(BadGuyTest, AddedEnemyIsAnEnemy) {
 	baddie->addEnemy(enemy);
 
@@ -65,6 +106,17 @@ TEST_F(BadGuyTest, AddingEnemyMoreThanOnceIsIgnored) {
 	baddie->addEnemy(enemy);
 
 	ASSERT_EQ(baddie->getNumberEnemies(), 1);
+}
+
+TEST_F(BadGuyTest, CanAccessEnemiesCollection) {
+	baddie->addEnemy(enemy);
+
+	auto enemies = baddie->getEnemies();
+
+	// Get first (and, in this case only) enemy
+	for (auto e : enemies) {
+		ASSERT_EQ(e->getName(), enemy->getName());
+	}
 }
 
 TEST_F(BadGuyTest, AddingEnemyAlsoAddsMeToTheirEnemies) {
@@ -119,6 +171,48 @@ TEST(GraphTest, ForTwoPairsOfEnemiesWithOneSharedEnemyTheSharedEnemyHasTwoEnemie
 	graph.addPairing("Baddie", "Nemesis");
 
 	ASSERT_EQ(graph.getNodeByName("Baddie")->getNumberEnemies(), 2);
+}
+
+TEST(GraphTest, ForEnemyPairSolvingSetsColours) {
+	Graph graph;
+
+	graph.addPairing("Baddie", "Enemy");
+	graph.solve();
+
+	ASSERT_NE(graph.getNodeByName("Baddie")->getColour(), none);
+	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), none);
+}
+
+TEST(GraphTest, ForEnemyPairSolvingSetsDifferentColours) {
+	Graph graph;
+
+	graph.addPairing("Baddie", "Enemy");
+	graph.solve();
+
+	ASSERT_EQ(graph.getNodeByName("Baddie")->getColour(), red);
+	ASSERT_EQ(graph.getNodeByName("Enemy")->getColour(), black);
+}
+
+TEST(GraphTest, ForTwoPairsOfEnemiesWithOneSharedEnemyThenSharedEnemyIsDifferentColour) {
+	Graph graph;
+	graph.addPairing("Baddie", "Enemy");
+	graph.addPairing("Baddie", "Nemesis");
+	graph.solve();
+
+	Colour shared = graph.getNodeByName("Baddie")->getColour();
+
+	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), shared);
+	ASSERT_NE(graph.getNodeByName("Nemesis")->getColour(), shared);
+}
+
+TEST(GraphTest, ForChainedEnemiesTheyAlternateColours) {
+	Graph graph;
+	graph.addPairing("Baddie", "Enemy");
+	graph.addPairing("Enemy", "Nemesis");
+	graph.solve();
+
+	ASSERT_NE(graph.getNodeByName("Baddie")->getColour(), graph.getNodeByName("Enemy")->getColour());
+	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), graph.getNodeByName("Nemesis")->getColour());
 }
 
 int main(int ac, char* av[])

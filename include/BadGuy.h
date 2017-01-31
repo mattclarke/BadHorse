@@ -4,21 +4,31 @@
 #include <memory>
 #include <set>
 
+enum Colour { none, red, black };
 
 class BadGuy {
 private:
 	std::set<std::shared_ptr<BadGuy>> enemies;
 	std::string name;
+	Colour colour;
 
 public:
 	static void addEnemyAndViceVersa(std::shared_ptr<BadGuy> enemy1, std::shared_ptr<BadGuy> enemy2);
 
-	BadGuy(std::string name) : name(name) {
+	BadGuy(std::string name) : name(name), colour(none) {
 
 	}
 
 	std::string getName() {
 		return name;
+	}
+
+	Colour getColour() {
+		return colour;
+	}
+
+	void setColour(Colour colour) {
+		this->colour = colour;
 	}
 
 	size_t getNumberEnemies() const {
@@ -36,6 +46,10 @@ public:
 		}
 
 		return false;
+	}
+
+	std::set<std::shared_ptr<BadGuy>> getEnemies() {
+		return enemies;
 	}
 };
 
