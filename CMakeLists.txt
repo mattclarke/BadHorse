@@ -34,7 +34,7 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 ## BUILD
 FILE(GLOB MY_HEADERS "include/*.h")              
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include) 
-#add_executable(BadHorse src/main.cpp ${MY_HEADERS})
+add_executable(BadHorse src/main.cpp ${MY_HEADERS})
 
 
 ## TESTS
