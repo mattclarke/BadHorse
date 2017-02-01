@@ -8,6 +8,24 @@ class Graph {
 private:
 	std::map<std::string, std::shared_ptr<BadGuy>> nodes;
 
+	Colour switchColour(Colour colour) {
+		if (colour == red) {
+			return black;
+		}
+		else {
+			return red;
+		}
+	}
+
+	void colourConnections(std::shared_ptr<BadGuy> node, Colour colour) {
+		for (auto const& e : node->getEnemies()) {
+			if (e->getColour() == none) {
+				e->setColour(colour);
+				colourConnections(e, switchColour(colour));
+			}
+		}
+	}
+
 public:
 	int getNumberNodes() const {
 		return nodes.size();
@@ -37,18 +55,9 @@ public:
 			if (n.second->getColour() == none) {
 				n.second->setColour(first);
 
-				if (first == red) {
-					first = black;
-				}
-				else {
-					first = red;
-				}
+				first = switchColour(first);
 
-				for (auto const& e : n.second->getEnemies()) {
-					if (e->getColour() == none) {
-						e->setColour(first);
-					}
-				}
+				colourConnections(n.second, first);
 			}
 		}
 	}
@@ -213,6 +222,14 @@ TEST(GraphTest, ForChainedEnemiesTheyAlternateColours) {
 
 	ASSERT_NE(graph.getNodeByName("Baddie")->getColour(), graph.getNodeByName("Enemy")->getColour());
 	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), graph.getNodeByName("Nemesis")->getColour());
+}
+
+TEST(GraphTest, ForChainedEnemiesCanBeSolvedIsTrue) {
+	Graph graph;
+	graph.addPairing("Baddie", "Enemy");
+	graph.addPairing("Enemy", "Nemesis");
+
+	ASSERT_EQ(true, graph.solve())
 }
 
 int main(int ac, char* av[])
