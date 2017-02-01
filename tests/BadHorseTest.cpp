@@ -47,19 +47,23 @@ public:
 		return nodes[name];
 	}
 
-	void solve() {
+	bool canBeSolved() {
 		Colour first = red;
 
 		for (auto const& n : nodes) {
 			// Might as well start from the first node whatever it is
+			// Only do a node if it has no colour - that means it hasn't be picked up by the recursion
 			if (n.second->getColour() == none) {
 				n.second->setColour(first);
 
 				first = switchColour(first);
 
+				// Start recusion
 				colourConnections(n.second, first);
 			}
 		}
+
+		return true;
 	}
 };
 
@@ -186,7 +190,7 @@ TEST(GraphTest, ForEnemyPairSolvingSetsColours) {
 	Graph graph;
 
 	graph.addPairing("Baddie", "Enemy");
-	graph.solve();
+	graph.canBeSolved();
 
 	ASSERT_NE(graph.getNodeByName("Baddie")->getColour(), none);
 	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), none);
@@ -196,7 +200,7 @@ TEST(GraphTest, ForEnemyPairSolvingSetsDifferentColours) {
 	Graph graph;
 
 	graph.addPairing("Baddie", "Enemy");
-	graph.solve();
+	graph.canBeSolved();
 
 	ASSERT_EQ(graph.getNodeByName("Baddie")->getColour(), red);
 	ASSERT_EQ(graph.getNodeByName("Enemy")->getColour(), black);
@@ -206,7 +210,7 @@ TEST(GraphTest, ForTwoPairsOfEnemiesWithOneSharedEnemyThenSharedEnemyIsDifferent
 	Graph graph;
 	graph.addPairing("Baddie", "Enemy");
 	graph.addPairing("Baddie", "Nemesis");
-	graph.solve();
+	graph.canBeSolved();
 
 	Colour shared = graph.getNodeByName("Baddie")->getColour();
 
@@ -218,7 +222,7 @@ TEST(GraphTest, ForChainedEnemiesTheyAlternateColours) {
 	Graph graph;
 	graph.addPairing("Baddie", "Enemy");
 	graph.addPairing("Enemy", "Nemesis");
-	graph.solve();
+	graph.canBeSolved();
 
 	ASSERT_NE(graph.getNodeByName("Baddie")->getColour(), graph.getNodeByName("Enemy")->getColour());
 	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), graph.getNodeByName("Nemesis")->getColour());
@@ -229,7 +233,16 @@ TEST(GraphTest, ForChainedEnemiesCanBeSolvedIsTrue) {
 	graph.addPairing("Baddie", "Enemy");
 	graph.addPairing("Enemy", "Nemesis");
 
-	ASSERT_EQ(true, graph.solve())
+	ASSERT_EQ(true, graph.canBeSolved());
+}
+
+TEST(GraphTest, ForNoSolutionPossibleCanBeSolvedIsFalse) {
+	Graph graph;
+	graph.addPairing("Dead_Bowie", "Fake_Thomas_Jefferson");
+	graph.addPairing("Fake_Thomas_Jefferson", "Fury_Leika");
+	graph.addPairing("Fury_Leika", "Dead_Bowie");
+
+	ASSERT_EQ(false, graph.canBeSolved());
 }
 
 int main(int ac, char* av[])
