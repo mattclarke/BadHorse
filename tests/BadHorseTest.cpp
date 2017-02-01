@@ -9,21 +9,29 @@ private:
 	std::map<std::string, std::shared_ptr<BadGuy>> nodes;
 
 	Colour switchColour(Colour colour) {
-		if (colour == red) {
-			return black;
+		if (colour == Colour::RED) {
+			return Colour::BLACK;
 		}
 		else {
-			return red;
+			return Colour::RED;
 		}
 	}
 
-	void colourConnections(std::shared_ptr<BadGuy> node, Colour colour) {
+	bool colourConnections(std::shared_ptr<BadGuy> node, Colour colour) {
 		for (auto const& e : node->getEnemies()) {
-			if (e->getColour() == none) {
+			if (e->getColour() == Colour::NONE) {
 				e->setColour(colour);
-				colourConnections(e, switchColour(colour));
+				if (!colourConnections(e, switchColour(colour))) {
+					return false;
+				}
+			}
+			else if (e->getColour() != colour) {
+				// We have a mismatch so the problem cannot be solved
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 public:
@@ -48,18 +56,20 @@ public:
 	}
 
 	bool canBeSolved() {
-		Colour first = red;
+		Colour first = Colour::RED;
 
 		for (auto const& n : nodes) {
 			// Might as well start from the first node whatever it is
 			// Only do a node if it has no colour - that means it hasn't be picked up by the recursion
-			if (n.second->getColour() == none) {
+			if (n.second->getColour() == Colour::NONE) {
 				n.second->setColour(first);
 
 				first = switchColour(first);
 
 				// Start recusion
-				colourConnections(n.second, first);
+				if (!colourConnections(n.second, first)) {
+					return false;
+				}
 			}
 		}
 
@@ -99,14 +109,14 @@ TEST(BadHorseSolver, GettingNameReturnsName) {
 TEST(BadHorseSolver, GettingColourWhenNotSetReturnsNone) {
 	BadGuy baddie("Dave");
 
-	ASSERT_EQ(baddie.getColour(), none);
+	ASSERT_EQ(baddie.getColour(), Colour::NONE);
 }
 
 TEST(BadHorseSolver, AfterSettingColourGettingColourReturnsSetValue) {
 	BadGuy baddie("Dave");
-	baddie.setColour(red);
+	baddie.setColour(Colour::RED);
 
-	ASSERT_EQ(baddie.getColour(), red);
+	ASSERT_EQ(baddie.getColour(), Colour::RED);
 }
 
 TEST_F(BadGuyTest, AddedEnemyIsAnEnemy) {
@@ -192,8 +202,8 @@ TEST(GraphTest, ForEnemyPairSolvingSetsColours) {
 	graph.addPairing("Baddie", "Enemy");
 	graph.canBeSolved();
 
-	ASSERT_NE(graph.getNodeByName("Baddie")->getColour(), none);
-	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), none);
+	ASSERT_NE(graph.getNodeByName("Baddie")->getColour(), Colour::NONE);
+	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), Colour::NONE);
 }
 
 TEST(GraphTest, ForEnemyPairSolvingSetsDifferentColours) {
@@ -202,8 +212,8 @@ TEST(GraphTest, ForEnemyPairSolvingSetsDifferentColours) {
 	graph.addPairing("Baddie", "Enemy");
 	graph.canBeSolved();
 
-	ASSERT_EQ(graph.getNodeByName("Baddie")->getColour(), red);
-	ASSERT_EQ(graph.getNodeByName("Enemy")->getColour(), black);
+	ASSERT_EQ(graph.getNodeByName("Baddie")->getColour(), Colour::RED);
+	ASSERT_EQ(graph.getNodeByName("Enemy")->getColour(), Colour::BLACK);
 }
 
 TEST(GraphTest, ForTwoPairsOfEnemiesWithOneSharedEnemyThenSharedEnemyIsDifferentColour) {

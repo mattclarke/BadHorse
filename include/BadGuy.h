@@ -4,7 +4,7 @@
 #include <memory>
 #include <set>
 
-enum Colour { none, red, black };
+enum class Colour { NONE, RED, BLACK };
 
 class BadGuy {
 private:
@@ -15,7 +15,7 @@ private:
 public:
 	static void addEnemyAndViceVersa(std::shared_ptr<BadGuy> enemy1, std::shared_ptr<BadGuy> enemy2);
 
-	BadGuy(std::string name) : name(name), colour(none) {
+	BadGuy(std::string name) : name(name), colour(Colour::NONE) {
 
 	}
 
