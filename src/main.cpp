@@ -16,8 +16,7 @@ int main(int argc, char *argv[]) {
 	
 	int count = 0;
 
-	while (std::getline(infile, line))
-	{
+	while (std::getline(infile, line)) {
 		// Get number of pairs
 		std::istringstream iss(line);
 		int numberPairs;
