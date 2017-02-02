@@ -3,27 +3,27 @@
 #include <iostream>
 #include "Graph.h"
 
-int main() {
-	std::ifstream infile("A-small-practice-1.in");
+int main(int argc, char *argv[]) {
+	std::ifstream infile(argv[1]);
 
 	std::string line;
 
 	// Get total number of sets
 	std::getline(infile, line);
 	std::istringstream iss(line);
-	int total_sets;
-	iss >> total_sets;
+	int totalSets;
+	iss >> totalSets;
 	
 	int count = 0;
 
-
 	while (std::getline(infile, line))
 	{
+		// Get number of pairs
 		std::istringstream iss(line);
 		int numberPairs;
 		iss >> numberPairs;
 
-		//std::cout << "Number pairs: " << numberPairs << std::endl;
+		// Construct the graph
 		Graph graph;
 		
 		for (int i = 0; i < numberPairs; ++i) {
@@ -33,6 +33,8 @@ int main() {
 			iss >> first >> second;
 			graph.addPairing(first, second);
 		}
+
+		// See if it is solvable
 		if (graph.canBeSolved()) {
 			std::cout << "Case #" << ++count << ": Yes" << std::endl;
 		}
@@ -40,5 +42,4 @@ int main() {
 			std::cout << "Case #" << ++count << ": No" << std::endl;
 		}
 	}
-
 }
