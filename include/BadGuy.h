@@ -19,11 +19,11 @@ public:
 
 	}
 
-	std::string getName() {
+	std::string getName() const {
 		return name;
 	}
 
-	Colour getColour() {
+	Colour getColour() const {
 		return colour;
 	}
 
@@ -39,7 +39,7 @@ public:
 		enemies.insert(enemy);
 	}
 
-	bool isEnemy(std::shared_ptr<BadGuy> enemy) {
+	bool isEnemy(std::shared_ptr<BadGuy> enemy) const {
 		auto it = enemies.find(enemy);
 		if (it != enemies.end()) {
 			return true;
