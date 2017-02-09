@@ -1,7 +1,5 @@
 #include <vector>
 #include <memory>
-#include <map>
-#include <algorithm>
 #include "gmock/gmock.h"
 #include "BadGuy.h"
 #include "Graph.h"
@@ -148,7 +146,7 @@ TEST(GraphTest, ForTwoPairsOfEnemiesWithOneSharedEnemyThenSharedEnemyIsDifferent
 	graph.addPairing("Baddie", "Nemesis");
 	graph.canBeSolved();
 
-	Colour shared = graph.getNodeByName("Baddie")->getColour();
+	auto shared = graph.getNodeByName("Baddie")->getColour();
 
 	ASSERT_NE(graph.getNodeByName("Enemy")->getColour(), shared);
 	ASSERT_NE(graph.getNodeByName("Nemesis")->getColour(), shared);

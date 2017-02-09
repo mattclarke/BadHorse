@@ -57,7 +57,7 @@ public:
 	}
 
 	bool canBeSolved() {
-		Colour first = Colour::RED;
+		auto first = Colour::RED;
 
 		for (auto const& n : nodes) {
 			// Might as well start from the first node whatever it is

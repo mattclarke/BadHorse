@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include <memory>
 #include <set>
 
@@ -15,7 +14,7 @@ private:
 public:
 	static void addEnemyAndViceVersa(std::shared_ptr<BadGuy> enemy1, std::shared_ptr<BadGuy> enemy2);
 
-	BadGuy(std::string name) : name(name), colour(Colour::NONE) {
+	explicit BadGuy(std::string name) : name(name), colour(Colour::NONE) {
 
 	}
 
@@ -48,7 +47,7 @@ public:
 		return false;
 	}
 
-	std::set<std::shared_ptr<BadGuy>> getEnemies() {
+	std::set<std::shared_ptr<BadGuy>> getEnemies() const {
 		return enemies;
 	}
 };
